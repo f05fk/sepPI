@@ -323,6 +323,46 @@ sub pcd_transceive
     return (MI_OK, $bytes, $lastBits, $bits, @result);
 }
 
+sub pcd_calculateCRC
+{
+    my $self = shift;
+    my @data = @_;
+
+    printf "CRC data: " . join(':', map {sprintf "%02x", $_} @data) . "\n";
+
+#    $self->pcd_write(DivIEnReg, 0xXX);
+    $self->pcd_clearBitMask(DivIrqReg, 0x04);
+    $self->pcd_setBitMask(FIFOLevelReg, 0x80);
+    $self->pcd_write(CommandReg, PCD_IDLE);
+
+    foreach my $data (@data)
+    {
+        $self->pcd_write(FIFODataReg, $data);
+    }
+
+    $self->pcd_write(CommandReg, PCD_CALCCRC);
+
+    my $irqs;
+    my $i = 0xFF;
+    do
+    {
+        $irqs = $self->pcd_read(DivIrqReg);
+        $i--;
+    }
+    while ($i != 0 && !($irqs & 0x04));
+
+#    print "\ni = $i\n";
+#    printf "irqs = %08b\n", $irqs;
+#    printf "error = %08b\n", $self->pcd_read(ErrorReg);
+
+    my $crcL = $self->pcd_read(CRCResultRegL);
+    my $crcH = $self->pcd_read(CRCResultRegH);
+
+    printf "CRC result: %02x %02x\n", $crcL, $crcH;
+
+    return ($crcL, $crcH);
+}
+
 sub picc_wakeup
 {
     my $self = shift;
@@ -342,18 +382,59 @@ sub picc_wakeup
 sub picc_anticoll
 {
     my $self = shift;
+    my $cascade = shift;
     my @uid = @_;
 
     $self->pcd_write(BitFramingReg, 0x00);
 
-    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive(PICC_ANTICOLL1, 0x20);
+    print "picc_anticoll: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x20)) . "\n";
+    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive($cascade, 0x20);
 
-    printf "check: %02x %02x\n", $result[0] ^ $result[1] ^ $result[2] ^ $result[3], $result[4];
     return MI_ERR if (($result[0] ^ $result[1] ^ $result[2] ^ $result[3]) != $result[4]);
 
     my $datahex = join(':', map {sprintf "%02x", $_} @result);
     my $databin = join(' ', map {sprintf "%08b", $_} @result);
-    print "picc_anticoll1: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
+    print "picc_anticoll: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
+
+    return ($status, @result);
+}
+
+sub picc_select
+{
+    my $self = shift;
+    my $cascade = shift;
+    my @uid = @_;
+
+    $self->pcd_write(BitFramingReg, 0x00);
+
+    my @crc = $self->pcd_calculateCRC($cascade, 0x70, @uid);
+
+    print "picc_select: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x70, @uid, @crc)) . "\n";
+
+    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive($cascade, 0x70, @uid, @crc);
+
+    my $datahex = join(':', map {sprintf "%02x", $_} @result);
+    my $databin = join(' ', map {sprintf "%08b", $_} @result);
+    print "picc_select: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
+
+    return $status;
+}
+
+sub picc_selectTag
+{
+    my $self = shift;
+    my @uid = @_;
+
+    my $status;
+    my @data;
+
+    $self->picc_wakeup();
+    ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL1);
+    ($status, @data) = $self->picc_select(PICC_ANTICOLL1, @data);
+    ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL2);
+    ($status, @data) = $self->picc_select(PICC_ANTICOLL2, @data);
+    ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL3);
+    ($status, @data) = $self->picc_select(PICC_ANTICOLL3, @data);
 
     return $status;
 }
