@@ -37,6 +37,18 @@ use constant
     MI_NOTAGERR => 1,
     MI_ERR      => 2,
 
+    RECEIVER_GAIN_0_18dB => 0,
+    RECEIVER_GAIN_1_23dB => 1,
+    RECEIVER_GAIN_2_18dB => 2,
+    RECEIVER_GAIN_3_23dB => 3,
+    RECEIVER_GAIN_4_33dB => 4,
+    RECEIVER_GAIN_5_38dB => 5,
+    RECEIVER_GAIN_6_43dB => 6,
+    RECEIVER_GAIN_7_48dB => 7,
+    RECEIVER_GAIN_MIN => 0,
+    RECEIVER_GAIN_AVG => 4,
+    RECEIVER_GAIN_MAX => 7,
+
     Reserved00     => 0x00,
     CommandReg     => 0x01,
     ComIEnReg      => 0x02,
@@ -250,6 +262,16 @@ sub pcd_antenna_off
     my $self = shift;
 
     $self->pcd_clearBitMask(TxControlReg, 0x03);
+
+    return;
+}
+
+sub pcd_setReceiverGain
+{
+    my $self = shift;
+    my $receiverGain = shift;
+
+    $self->pcd_setBitMask(RFCfgReg, ($receiverGain & 0x07) << 4);
 
     return;
 }
