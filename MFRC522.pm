@@ -7,8 +7,6 @@ use Device::BCM2835;
 
 use constant
 {
-    MAX_LEN => 16,
-
     PCD_IDLE       => 0x00,
     PCD_AUTHENT    => 0x0E,
     PCD_RECEIVE    => 0x08,
@@ -36,6 +34,8 @@ use constant
     MI_OK       => 0,
     MI_NOTAGERR => 1,
     MI_ERR      => 2,
+
+    CASCADE_TAG => 0x88,
 
     RECEIVER_GAIN_0_18dB => 0,
     RECEIVER_GAIN_1_23dB => 1,
@@ -369,8 +369,8 @@ sub pcd_calculateCRC
 sub picc_wakeup
 {
     my $self = shift;
-    my @data = @_;
 
+#    $self->pcd_clearBitMask(CollReg, 0x80);
     $self->pcd_write(BitFramingReg, 0x07);
 
     my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive(PICC_WUPA);
@@ -426,20 +426,51 @@ sub picc_select
 sub picc_selectTag
 {
     my $self = shift;
-    my @uid = @_;
 
     my $status;
     my @data;
+    my @uidpart;
+    my @uid;
 
-    $self->picc_wakeup();
+    # Anticollision does not work anyway. With my hardware I already get an error in picc_wakeup when
+    # two PICCs are in range of PCD. Therefore I never get a collision.
+
+    $status = $self->picc_wakeup();
+    return $status if ($status != MI_OK);
+
     ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL1);
+    return $status if ($status != MI_OK);
+    @uidpart = @data[0..3];
     ($status, @data) = $self->picc_select(PICC_ANTICOLL1, @data);
-    ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL2);
-    ($status, @data) = $self->picc_select(PICC_ANTICOLL2, @data);
-    ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL3);
-    ($status, @data) = $self->picc_select(PICC_ANTICOLL3, @data);
+    return $status if ($status != MI_OK);
 
-    return $status;
+    if ($uidpart[0] != CASCADE_TAG)
+    {
+        @uid = @uidpart;
+        return ($status, @uid);
+    }
+    @uid = @uidpart[1..3];
+
+    ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL2);
+    return $status if ($status != MI_OK);
+    @uidpart = @data[0..3];
+    ($status, @data) = $self->picc_select(PICC_ANTICOLL2, @data);
+    return $status if ($status != MI_OK);
+
+    if ($uidpart[0] != CASCADE_TAG)
+    {
+        @uid[3..6] = @uidpart;
+        return ($status, @uid);
+    }
+    @uid[3..5] = @uidpart[1..3];
+
+    ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL3);
+    return $status if ($status != MI_OK);
+    ($status, @data) = $self->picc_select(PICC_ANTICOLL3, @data);
+    return $status if ($status != MI_OK);
+
+    @uid[6..9] = @uidpart;
+    return ($status, @uid);
 }
 
 1;
