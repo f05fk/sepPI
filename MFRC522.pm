@@ -125,27 +125,18 @@ sub spi_begin
     my $self = shift;
 
 #    Device::BCM2835::set_debug(1);
-    print "spi_begin: init()\n";
     Device::BCM2835::init() || die "Could not init library";
 
-    print "spi_begin: spi_begin()\n";
     Device::BCM2835::spi_begin();
-    print "spi_begin: spi_setBitOrder(Device::BCM2835::BCM2835_SPI_BIT_ORDER_MSBFIRST)\n";
     Device::BCM2835::spi_setBitOrder(Device::BCM2835::BCM2835_SPI_BIT_ORDER_MSBFIRST);
-    print "spi_begin: spi_setDataMode(Device::BCM2835::BCM2835_SPI_MODE0)\n";
     Device::BCM2835::spi_setDataMode(Device::BCM2835::BCM2835_SPI_MODE0);
 
-#    print "spi_begin: spi_setClockDivider(Device::BCM2835::BCM2835_SPI_CLOCK_DIVIDER_65536)\n";
 #    Device::BCM2835::spi_setClockDivider(Device::BCM2835::BCM2835_SPI_CLOCK_DIVIDER_65536);
-    print "spi_begin: spi_setClockDivider(Device::BCM2835::BCM2835_SPI_CLOCK_DIVIDER_32)\n";
     Device::BCM2835::spi_setClockDivider(Device::BCM2835::BCM2835_SPI_CLOCK_DIVIDER_32);
 
-    print "spi_begin: spi_chipSelect(Device::BCM2835::BCM2835_SPI_CS0)\n";
     Device::BCM2835::spi_chipSelect(Device::BCM2835::BCM2835_SPI_CS0);
 
-#    print "spi_begin: spi_setChipSelectPolarity(Device::BCM2835::BCM2835_SPI_CS0, 0)\n";
 #    Device::BCM2835::spi_setChipSelectPolarity(Device::BCM2835::BCM2835_SPI_CS0, 0);
-    print "spi_begin: spi_setChipSelectPolarity(Device::BCM2835::BCM2835_SPI_CS0, Device::BCM2835::LOW)\n";
     Device::BCM2835::spi_setChipSelectPolarity(Device::BCM2835::BCM2835_SPI_CS0, Device::BCM2835::LOW);
 
     return;
@@ -225,25 +216,18 @@ sub pcd_reset
     my $self = shift;
 
     # reset
-    print "pcd_reset: pcd_write(CommandReg, PCD_RESETPHASE)\n";
     $self->pcd_write(CommandReg, PCD_RESETPHASE);
 
     # timer
-    print "pcd_reset: pcd_write(TModeReg, 0x8D)\n";
     $self->pcd_write(TModeReg, 0x8D);
-    print "pcd_reset: pcd_write(TPrescalerReg, 0x3E)\n";
     $self->pcd_write(TPrescalerReg, 0x3E);
-    print "pcd_reset: pcd_write(TReloadRegL, 30)\n";
     $self->pcd_write(TReloadRegL, 30);
-    print "pcd_reset: pcd_write(TReloadRegH, 0)\n";
     $self->pcd_write(TReloadRegH, 0);
 
     # modulation
-    print "pcd_reset: pcd_write(TxASKReg, 0x40)\n";
     $self->pcd_write(TxASKReg, 0x40);
     # general mode for transmit and receive
-    print "pcd_reset: pcd_write(ModeReg, 0x3D)\n";
-    $self->pcd_write(ModeReg, 0x3D);
+    $self->pcd_write(ModeReg, 0x3D);         # 0x29 ?
 
     return;
 }
@@ -252,11 +236,9 @@ sub pcd_antenna_on
 {
     my $self = shift;
 
-    print "pcd_antenna_on: pcd_read(TxControlReg)\n";
     my $value = $self->pcd_read(TxControlReg);
     if (!($value & 0x03))
     {
-        print "pcd_antenna_on: pcd_setBitMask(TxControlReg, 0x03)\n";
         $self->pcd_setBitMask(TxControlReg, 0x03);
     }
 
@@ -267,7 +249,6 @@ sub pcd_antenna_off
 {
     my $self = shift;
 
-    print "pcd_antenna_off: pcd_clearBitMask(TxControlReg, 0x03)\n";
     $self->pcd_clearBitMask(TxControlReg, 0x03);
 
     return;
