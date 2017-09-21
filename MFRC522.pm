@@ -399,6 +399,8 @@ sub picc_wakeup
 
     my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive(PICC_WUPA);
 
+    $self->pcd_write(BitFramingReg, 0x00);
+
 #    my $datahex = join(':', map {sprintf "%02x", $_} @result);
 #    my $databin = join(' ', map {sprintf "%08b", $_} @result);
 #    print "picc_wakeup: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
@@ -412,10 +414,10 @@ sub picc_anticoll
     my $cascade = shift;
     my @uid = @_;
 
-    $self->pcd_write(BitFramingReg, 0x00);
+    my @buffer = ($cascade, 0x20);
 
-#    print "picc_anticoll: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x20)) . "\n";
-    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive($cascade, 0x20);
+#    print "picc_anticoll: " . join(':', map {sprintf "%02x", $_} (@buffer)) . "\n";
+    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive(@buffer);
 
     return MI_ERR if (($result[0] ^ $result[1] ^ $result[2] ^ $result[3]) != $result[4]);
 
@@ -432,13 +434,12 @@ sub picc_select
     my $cascade = shift;
     my @uid = @_;
 
-    $self->pcd_write(BitFramingReg, 0x00);
+    my @buffer = ($cascade, 0x70, @uid);
+    push @buffer, $self->pcd_calculateCRC(@buffer);
 
-    my @crc = $self->pcd_calculateCRC($cascade, 0x70, @uid);
+#    print "picc_select: " . join(':', map {sprintf "%02x", $_} (@buffer)) . "\n";
 
-#    print "picc_select: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x70, @uid, @crc)) . "\n";
-
-    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive($cascade, 0x70, @uid, @crc);
+    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive(@buffer);
 
 #    my $datahex = join(':', map {sprintf "%02x", $_} @result);
 #    my $databin = join(' ', map {sprintf "%08b", $_} @result);
