@@ -149,6 +149,13 @@ sub new
     return $self;
 }
 
+sub close
+{
+    my $self = shift;
+
+    $self->spi_end();
+}
+
 sub spi_begin
 {
     my $self = shift;
@@ -188,7 +195,7 @@ sub spi_end
     my $self = shift;
 
     Device::BCM2835::spi_end();
-    Device::BCM2835::close();
+#    Device::BCM2835::close();
 
     return;
 }

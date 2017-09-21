@@ -21,10 +21,22 @@ use warnings;
 
 use MFRC522;
 
+my $run = 1;
+$SIG{INT}  = sub { $run = 0 };
+$SIG{TERM} = sub { $run = 0 };
+
 my $mfrc522 = MFRC522->new();
 $mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
 
-my ($status, @uid) = $mfrc522->picc_selectTag();
+while ($run)
+{
+    my ($status, @uid) = $mfrc522->picc_selectTag();
 
-my $uidhex = join(':', map {sprintf "%02x", $_} @uid);
-print "found PICC: status [$status] UID [$uidhex]\n";
+    my $uidhex = join(':', map {sprintf "%02x", $_} @uid);
+    print "found PICC: status [$status] UID [$uidhex]\n";
+
+    sleep(1);
+}
+
+$mfrc522->close();
+exit 0;
