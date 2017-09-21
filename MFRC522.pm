@@ -447,7 +447,38 @@ sub picc_select
     return $status;
 }
 
-sub picc_selectTag
+sub picc_halt
+{
+    my $self = shift;
+
+    my @buffer = (PICC_HALT, 0);
+    push @buffer, $self->pcd_calculateCRC(@buffer);
+
+    my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive(@buffer);
+
+    return $status;
+}
+
+sub picc_readUID
+{
+    my $self = shift;
+
+    my $status;
+    my @uid;
+
+    $status = $self->picc_wakeup();
+    return $status if ($status != MI_OK);
+
+    ($status, @uid) = $self->picc_anticollSelectCascade();
+    return $status if ($status != MI_OK);
+
+    $status = $self->picc_halt();
+#    return $status if ($status != MI_OK);
+
+    return (MI_OK, @uid);
+}
+
+sub picc_anticollSelectCascade
 {
     my $self = shift;
 
@@ -458,9 +489,6 @@ sub picc_selectTag
 
     # Anticollision does not work anyway. With my hardware I already get an error in picc_wakeup when
     # two PICCs are in range of PCD. Therefore I never get a collision.
-
-    $status = $self->picc_wakeup();
-    return $status if ($status != MI_OK);
 
     ($status, @data) = $self->picc_anticoll(PICC_ANTICOLL1);
     return $status if ($status != MI_OK);

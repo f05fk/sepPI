@@ -30,7 +30,7 @@ $mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
 
 while ($run)
 {
-    my ($status, @uid) = $mfrc522->picc_selectTag();
+    my ($status, @uid) = $mfrc522->picc_readUID();
 
     my $uidhex = join(':', map {sprintf "%02x", $_} @uid);
     print "found PICC: status [$status] UID [$uidhex]\n";
