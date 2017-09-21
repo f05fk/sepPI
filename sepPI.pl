@@ -28,12 +28,32 @@ $SIG{TERM} = sub { $run = 0 };
 my $mfrc522 = MFRC522->new();
 $mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
 
+my $uid1 = "";
+my $uid2 = "";
+my $uid3 = "";
 while ($run)
 {
     my ($status, @uid) = $mfrc522->picc_readUID();
 
-    my $uidhex = join(':', map {sprintf "%02x", $_} @uid);
-    print "found PICC: status [$status] UID [$uidhex]\n";
+    $uid1 = join('-', map {sprintf "%02x", $_} reverse @uid);
+#    print "found PICC: status [$status] UID [$uid1]\n";
+    if ($uid1 ne $uid2)
+    {
+        if ($uid1 eq "")
+        {
+            print "$uid3 went away\n";
+        }
+        elsif ($uid1 eq $uid3)
+        {
+            print "$uid3 came back\n";
+        }
+        else
+        {
+            $uid3 = $uid1;
+            print "$uid3 is NEW!\n";
+        }
+        $uid2 = $uid1;
+    }
 
     sleep(1);
 }
