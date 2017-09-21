@@ -348,7 +348,7 @@ sub pcd_calculateCRC
     my $self = shift;
     my @data = @_;
 
-    printf "CRC data: " . join(':', map {sprintf "%02x", $_} @data) . "\n";
+#    printf "CRC data: " . join(':', map {sprintf "%02x", $_} @data) . "\n";
 
 #    $self->pcd_write(DivIEnReg, 0xXX);
     $self->pcd_clearBitMask(DivIrqReg, 0x04);
@@ -378,7 +378,7 @@ sub pcd_calculateCRC
     my $crcL = $self->pcd_read(CRCResultRegL);
     my $crcH = $self->pcd_read(CRCResultRegH);
 
-    printf "CRC result: %02x %02x\n", $crcL, $crcH;
+#    printf "CRC result: %02x %02x\n", $crcL, $crcH;
 
     return ($crcL, $crcH);
 }
@@ -392,9 +392,9 @@ sub picc_wakeup
 
     my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive(PICC_WUPA);
 
-    my $datahex = join(':', map {sprintf "%02x", $_} @result);
-    my $databin = join(' ', map {sprintf "%08b", $_} @result);
-    print "picc_wakeup: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
+#    my $datahex = join(':', map {sprintf "%02x", $_} @result);
+#    my $databin = join(' ', map {sprintf "%08b", $_} @result);
+#    print "picc_wakeup: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
 
     return $status;
 }
@@ -407,14 +407,14 @@ sub picc_anticoll
 
     $self->pcd_write(BitFramingReg, 0x00);
 
-    print "picc_anticoll: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x20)) . "\n";
+#    print "picc_anticoll: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x20)) . "\n";
     my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive($cascade, 0x20);
 
     return MI_ERR if (($result[0] ^ $result[1] ^ $result[2] ^ $result[3]) != $result[4]);
 
-    my $datahex = join(':', map {sprintf "%02x", $_} @result);
-    my $databin = join(' ', map {sprintf "%08b", $_} @result);
-    print "picc_anticoll: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
+#    my $datahex = join(':', map {sprintf "%02x", $_} @result);
+#    my $databin = join(' ', map {sprintf "%08b", $_} @result);
+#    print "picc_anticoll: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
 
     return ($status, @result);
 }
@@ -429,13 +429,13 @@ sub picc_select
 
     my @crc = $self->pcd_calculateCRC($cascade, 0x70, @uid);
 
-    print "picc_select: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x70, @uid, @crc)) . "\n";
+#    print "picc_select: " . join(':', map {sprintf "%02x", $_} ($cascade, 0x70, @uid, @crc)) . "\n";
 
     my ($status, $bytes, $lastBits, $bits, @result) = $self->pcd_transceive($cascade, 0x70, @uid, @crc);
 
-    my $datahex = join(':', map {sprintf "%02x", $_} @result);
-    my $databin = join(' ', map {sprintf "%08b", $_} @result);
-    print "picc_select: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
+#    my $datahex = join(':', map {sprintf "%02x", $_} @result);
+#    my $databin = join(' ', map {sprintf "%08b", $_} @result);
+#    print "picc_select: status [$status] bytes [$bytes] [$lastBits] [$bits] data [$datahex] [$databin]\n";
 
     return $status;
 }
