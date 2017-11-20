@@ -42,15 +42,21 @@ while ($run)
         if ($uid1 eq "")
         {
             print "$uid3 went away\n";
+#            system("mpc", "pause");
         }
         elsif ($uid1 eq $uid3)
         {
             print "$uid3 came back\n";
+#            system("mpc", "play");
         }
         else
         {
             $uid3 = $uid1;
             print "$uid3 is NEW!\n";
+#            system("mpc", "stop");
+#            system("mpc", "clear");
+#            system("mpc", "load", $uid3);
+#            system("mpc", "play");
         }
         $uid2 = $uid1;
     }
