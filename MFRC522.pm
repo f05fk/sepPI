@@ -13,6 +13,8 @@
 #                                                                       #
 # You should have received a copy of the GNU General Public License     #
 # along with this program.  If not, see <http://www.gnu.org/licenses/>. #
+#                                                                       #
+# SPDX-License-Identifier: GPL-3.0+                                     #
 #########################################################################
 
 package MFRC522;
@@ -339,7 +341,7 @@ sub pcd_transceive
 
     my $bytes = $self->pcd_read(FIFOLevelReg);
     my $lastBits = $self->pcd_read(ControlReg) & 0x07;
-    my $bits = ($lastBits ? ($bytes-1) : $bytes) * 8 + $lastBits; 
+    my $bits = ($lastBits ? ($bytes-1) : $bytes) * 8 + $lastBits;
 
     my @result;
     for ($i = 0; $i < $bytes; $i++)
