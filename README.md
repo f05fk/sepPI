@@ -29,24 +29,24 @@ https://github.com/codepope/rpi-rc522
                          +------------+------------+
                          | GPIO   PIN | PIN   GPIO |
                          +------------+------------+
-      common buttons <-- | PWR 3V3  1 | 2   5V PWR |
-      button volume+ <-- | 2        3 | 4   5V PWR | --> MAX98357.Vin
-      button volume- <-- | 3        5 | 6   GROUND | --> MAX98357.GND
-      button track+  <-- | 4        7 | 8       14 |
+                         | PWR 3V3  1 | 2   5V PWR |
+                         | 2        3 | 4   5V PWR | --> MAX98357.Vin
+                         | 3        5 | 6   GROUND | --> MAX98357.GND
+                         | 4        7 | 8       14 |
                          | GROUND   9 | 10      15 |
-      button track-  <-- | 17      11 | 12 CLK  18 | --> MAX98357.BCLK
-                         | 27      13 | 14  GROUND |
-                         | 22      15 | 16      23 |
-          RC522.3.3V <-- | PWR 3V3 17 | 18      24 |
-          RC522.MOSI <-- | 10 MOSI 19 | 20  GROUND |
+                         | 17      11 | 12 CLK  18 | --> MAX98357.BCLK
+                         | 27      13 | 14  GROUND | --> button volume+
+                         | 22      15 | 16      23 | --> button volume+
+          RC522.3.3V <-- | PWR 3V3 17 | 18      24 | --> button volume-
+          RC522.MOSI <-- | 10 MOSI 19 | 20  GROUND | --> button volume-
           RC522.MISO <-- | 9  MISO 21 | 22      25 | --> RC522.RST
           RC522.SCK  <-- | 11 SCLK 23 | 24 CE0   8 | --> RC522.SDA
           RC522.GND  <-- | GROUND  25 | 26 CE1   7 |
                          | 0       27 | 28       1 |
-                         | 5       29 | 30  GROUND |
-                         | 6       31 | 32      12 |
-                         | 13      33 | 34  GROUND |
-      MAX98357.LRCLK <-- | 19   FS 35 | 36      16 |
+                         | 5       29 | 30  GROUND | --> button next
+                         | 6       31 | 32      12 | --> button next
+                         | 13      33 | 34  GROUND | --> button prev
+      MAX98357.LRCLK <-- | 19   FS 35 | 36      16 | --> button prev
                          | 26      37 | 38 DIN  20 |
                          | GROUND  39 | 40 DOUT 21 | --> MAX98357.DIN
                          +------------+------------+

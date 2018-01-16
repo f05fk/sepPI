@@ -21,50 +21,70 @@
 use strict;
 use warnings;
 
-use MFRC522;
+use Device::BCM2835;
+use Time::HiRes qw(usleep);
 
 my $run = 1;
 $SIG{INT}  = sub { $run = 0 };
 $SIG{TERM} = sub { $run = 0 };
 
-my $mfrc522 = MFRC522->new();
-$mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
+Device::BCM2835::init();
 
-my $uid1 = "";
-my $uid2 = "";
-my $uid3 = "";
-while ($run)
+&initialize();
+
+my @buttons =
+(
+    {gpio => 23, value => 1, action => \&buttonVolumePlus},
+    {gpio => 24, value => 1, action => \&buttonVolumeMinus},
+    {gpio => 12, value => 1, action => \&buttonNext},
+    {gpio => 16, value => 1, action => \&buttonPrev},
+);
+
+foreach my $button (@buttons)
 {
-    my ($status, @uid) = $mfrc522->picc_readUID();
-
-    $uid1 = join('-', map {sprintf "%02x", $_} reverse @uid);
-#    print "found PICC: status [$status] UID [$uid1]\n";
-    if ($uid1 ne $uid2)
-    {
-        if ($uid1 eq "")
-        {
-#            print "$uid3 went away\n";
-            system("mpc", "pause");
-        }
-        elsif ($uid1 eq $uid3)
-        {
-#            print "$uid3 came back\n";
-            system("mpc", "play");
-        }
-        else
-        {
-            $uid3 = $uid1;
-#            print "$uid3 is NEW!\n";
-            system("mpc", "stop");
-            system("mpc", "clear");
-            system("mpc", "load", $uid3);
-            system("mpc", "play");
-        }
-        $uid2 = $uid1;
-    }
-
-    sleep 1;
+    Device::BCM2835::gpio_fsel($button->{gpio}, &Device::BCM2835::BCM2835_GPIO_FSEL_INPT);
+    Device::BCM2835::gpio_set_pud($button->{gpio}, &Device::BCM2835::BCM2835_GPIO_PUD_UP);
 }
 
-$mfrc522->close();
+while ($run)
+{
+    foreach my $button (@buttons)
+    {
+        my $lev = Device::BCM2835::gpio_lev($button->{gpio});
+        &{$button->{action}} if ($lev == 0 && $button->{value} == 1);
+        $button->{value} = $lev;
+    }
+    usleep 100000;
+}
+
 exit 0;
+
+sub initialize
+{
+#    print "initialize\n";
+    system("mpc volume 60 >/dev/null 2>&1");
+}
+
+sub buttonVolumePlus
+{
+#    print "button [+] pressed\n";
+    system("mpc volume +5 >/dev/null 2>&1");
+}
+
+sub buttonVolumeMinus
+{
+#    print "button [-] pressed\n";
+    system("mpc volume -5 >/dev/null 2>&1");
+}
+
+sub buttonNext
+{
+#    print "button [>] pressed\n";
+    system("mpc next >/dev/null 2>&1");
+}
+
+sub buttonPrev
+{
+#    print "button [<] pressed\n";
+    system("mpc prev >/dev/null 2>&1");
+}
