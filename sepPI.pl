@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -I /home/pi/sepPI
 #########################################################################
 # Copyright (C) 2017-2018 Claus Schrammel <claus@f05fk.net>             #
 #                                                                       #
