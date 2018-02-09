@@ -54,7 +54,7 @@ while ($run)
         &{$button->{action}} if ($lev == 0 && $button->{value} == 1);
         $button->{value} = $lev;
     }
-    usleep 100000;
+    usleep 50000;
 }
 
 exit 0;
