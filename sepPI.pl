@@ -27,6 +27,10 @@ my $run = 1;
 $SIG{INT}  = sub { $run = 0 };
 $SIG{TERM} = sub { $run = 0 };
 
+#print "reset\n";
+command("mpc stop");
+command("mpc clear");
+
 my $mfrc522 = MFRC522->new();
 $mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
 
@@ -44,21 +48,21 @@ while ($run)
         if ($uid1 eq "")
         {
 #            print "$uid3 went away\n";
-            system("mpc", "pause");
+            command("mpc pause");
         }
         elsif ($uid1 eq $uid3)
         {
 #            print "$uid3 came back\n";
-            system("mpc", "play");
+            command("mpc play");
         }
         else
         {
             $uid3 = $uid1;
 #            print "$uid3 is NEW!\n";
-            system("mpc", "stop");
-            system("mpc", "clear");
-            system("mpc", "load", $uid3);
-            system("mpc", "play");
+            command("mpc stop");
+            command("mpc clear");
+            command("mpc load $uid3");
+            command("mpc play");
         }
         $uid2 = $uid1;
     }
@@ -68,3 +72,10 @@ while ($run)
 
 $mfrc522->close();
 exit 0;
+
+sub command
+{
+    my $command = shift;
+
+    system("$command >/dev/null 2>&1");
+}
