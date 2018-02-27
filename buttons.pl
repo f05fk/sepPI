@@ -86,5 +86,5 @@ sub buttonNext
 sub buttonPrev
 {
 #    print "button [<] pressed\n";
-    system("mpc prev >/dev/null 2>&1");
+    system("mpc cdprev >/dev/null 2>&1");
 }
