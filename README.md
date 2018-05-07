@@ -8,6 +8,19 @@ The handling of the box is designed to be simple: select the audio content with 
 tags and control audio volume and track number with just 4 buttons.
 
 
+## Hardware List
+
+* RaspberryPI 1 Model A+ (but any RaspberryPI with 40pin header should do)
+* WLAN dongle (if the RaspberryPI does not already have WIFI)
+* Micro USB power supply
+* SD card
+* MFRC522 RFID reader
+* MAX98357 I2S Class-D Mono Amplifier
+* 4 or 8 Ohm speaker
+* 4 push buttons
+* female-female jumper wires
+* soldering utilities
+
 
 ## Datasheets
 https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf
@@ -83,3 +96,12 @@ https://github.com/codepope/rpi-rc522
      POWER SUPPLY (5V)  <-- | Vin              |
                             +------------------+
 
+## Setup RaspberryPI
+
+Install Raspbian on the SD card and do initial setup with raspi-config. Also enable SPI with
+raspi-config.
+
+Install mpd with "apt-get install mpd".
+
+Optionally configure "/etc/mpd.conf" to set "music\_directory" and "playlist\_directory" to a
+location where you want to put your music and playlists.
