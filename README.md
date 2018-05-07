@@ -1,5 +1,12 @@
 # sepPI
-Simple audio player for kids based on RaspberryPI
+Simple audio player box for kids with RFID tags based on RaspberryPI.
+
+
+
+The main focus is kids, but not only. It can play music, radio plays and web radio streams.
+The handling of the box is designed to be simple: select the audio content with prepared RFID
+tags and control audio volume and track number with just 4 buttons.
+
 
 
 ## Datasheets
@@ -30,8 +37,8 @@ https://github.com/codepope/rpi-rc522
                          | GPIO   PIN | PIN   GPIO |
                          +------------+------------+
                          | PWR 3V3  1 | 2   5V PWR |
-                         | 2        3 | 4   5V PWR | --> MAX98357.Vin
-                         | 3        5 | 6   GROUND | --> MAX98357.GND
+                         | 2        3 | 4   5V PWR |
+                         | 3        5 | 6   GROUND |
                          | 4        7 | 8       14 |
                          | GROUND   9 | 10      15 |
                          | 17      11 | 12 CLK  18 | --> MAX98357.BCLK
@@ -42,7 +49,7 @@ https://github.com/codepope/rpi-rc522
           RC522.MISO <-- | 9  MISO 21 | 22      25 | --> RC522.RST
           RC522.SCK  <-- | 11 SCLK 23 | 24 CE0   8 | --> RC522.SDA
           RC522.GND  <-- | GROUND  25 | 26 CE1   7 |
-                         | 0       27 | 28       1 |
+          RC522.IRQ  <-- | 0       27 | 28       1 |
                          | 5       29 | 30  GROUND | --> button next
                          | 6       31 | 32      12 | --> button next
                          | 13      33 | 34  GROUND | --> button prev
@@ -58,7 +65,7 @@ https://github.com/codepope/rpi-rc522
     RPI.23 (SCK)     <-- | SCK    |   / ______ \   |
     RPI.19 (MOSI)    <-- | MOSI   |  / /      \ \  |
     RPI.21 (MISO)    <-- | MISO   | | |        | | |
-                         | IRQ    | | |        | | |
+    RPI.27 (GPIO 0)  <-- | IRQ    | | |        | | |
     RPI.25 (GROUND)  <-- | GND    |  \ \______/ /  |
     RPI.22 (GPIO 25) <-- | RST    |   \________/   |
     RPI.17 (PWR 3V3) <-- | 3.3V   |                |
@@ -67,12 +74,12 @@ https://github.com/codepope/rpi-rc522
 
                                   MAX98357
                             +------------------+
-      RPI.19 (FS)      <--  | LRCLK            |
-      RPI.18 (CLK)     <--  | BCLK             |
-      RPI.21 (DOUT)    <--  | DIN     OUTPUT - |  -->  SPEAKER -
+          RPI.35 (FS)   <-- | LRCLK            |
+          RPI.12 (CLK)  <-- | BCLK             |
+          RPI.40 (DOUT) <-- | DIN     OUTPUT - | --> SPEAKER -
                             | GAIN             |
-                            | SD      OUTPUT + |  -->  SPEAKER +
-      RPI.6  (GROUND)  <--  | GND              |
-      RPI.4  (PWR 5V)  <--  | Vin              |
+                            | SD      OUTPUT + | --> SPEAKER +
+     POWER SUPPLY (GND) <-- | GND              |
+     POWER SUPPLY (5V)  <-- | Vin              |
                             +------------------+
 
