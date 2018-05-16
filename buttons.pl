@@ -32,59 +32,116 @@ Device::BCM2835::init();
 
 &initialize();
 
+# each button gets a bit assigned and is initialized with level 1 (pull up)
 my @buttons =
 (
-    {gpio => 23, value => 1, action => \&buttonVolumePlus},
-    {gpio => 24, value => 1, action => \&buttonVolumeMinus},
-    {gpio => 12, value => 1, action => \&buttonNext},
-    {gpio => 16, value => 1, action => \&buttonPrev},
+    {gpio => 12, level => 1, value => 0b0001},
+    {gpio => 16, level => 1, value => 0b0010},
+    {gpio => 23, level => 1, value => 0b0100},
+    {gpio => 24, level => 1, value => 0b1000},
 );
 
+# various bit patterns, i.e. buttons pressed together, can trigger actions
+my %actions =
+(
+    0b0001 => \&actionNext,
+    0b0010 => \&actionPrev,
+    0b0011 => \&actionRandom,
+    0b0100 => \&actionVolumePlus,
+    0b1000 => \&actionVolumeMinus,
+    0b1111 => \&actionShutdown,
+);
+
+# initialize buttons as input and pull up
 foreach my $button (@buttons)
 {
     Device::BCM2835::gpio_fsel($button->{gpio}, &Device::BCM2835::BCM2835_GPIO_FSEL_INPT);
     Device::BCM2835::gpio_set_pud($button->{gpio}, &Device::BCM2835::BCM2835_GPIO_PUD_UP);
 }
 
+# the event loop
+my $canFireAction = 0;
 while ($run)
 {
     foreach my $button (@buttons)
     {
-        my $lev = Device::BCM2835::gpio_lev($button->{gpio});
-        &{$button->{action}} if ($lev == 0 && $button->{value} == 1);
-        $button->{value} = $lev;
+        my $level = Device::BCM2835::gpio_lev($button->{gpio});
+
+        # if button is pressed (level == 0)
+        # and do not do calculations if already can fire action
+        if ($level == 0 && $button->{level} == 1 && $canFireAction == 0)
+        {
+            my $combinedState = &calculateCombinedState();
+            $canFireAction = 1 if ($combinedState == 0);
+        }
+
+        # if button is released (level == 1)
+        # and only do calculations if can fire action
+        if ($level == 1 && $button->{level} == 0 && $canFireAction == 1)
+        {
+            my $combinedState = &calculateCombinedState();
+            my $action = $actions{$combinedState};
+            &$action() if ($action);
+            $canFireAction = 0;
+        }
+
+        $button->{level} = $level;
     }
     usleep 50000;
 }
 
 exit 0;
 
+sub calculateCombinedState
+{
+    my $combinedState = 0;
+    foreach my $button (@buttons)
+    {
+        $combinedState |= $button->{value} if ($button->{level} == 0);
+    }
+    return $combinedState;
+}
+
 sub initialize
 {
 #    print "initialize\n";
-    system("mpc volume 60 >/dev/null 2>&1");
+    system("mpc volume 50 >/dev/null 2>&1");
 }
 
-sub buttonVolumePlus
-{
-#    print "button [+] pressed\n";
-    system("mpc volume +5 >/dev/null 2>&1");
-}
-
-sub buttonVolumeMinus
-{
-#    print "button [-] pressed\n";
-    system("mpc volume -5 >/dev/null 2>&1");
-}
-
-sub buttonNext
+sub actionNext
 {
 #    print "button [>] pressed\n";
     system("mpc next >/dev/null 2>&1");
 }
 
-sub buttonPrev
+sub actionPrev
 {
 #    print "button [<] pressed\n";
     system("mpc cdprev >/dev/null 2>&1");
+}
+
+sub actionRandom
+{
+#    print "random pressed\n";
+    system("mpc stop >/dev/null 2>&1");
+    system("mpc shuffle >/dev/null 2>&1");
+    system("mpc play >/dev/null 2>&1");
+}
+
+sub actionVolumePlus
+{
+#    print "button [+] pressed\n";
+    system("mpc volume +5 >/dev/null 2>&1");
+}
+
+sub actionVolumeMinus
+{
+#    print "button [-] pressed\n";
+    system("mpc volume -5 >/dev/null 2>&1");
+}
+
+sub actionShutdown
+{
+#    print "shutdown pressed\n";
+#    system("init 0 >/dev/null 2>&1");
 }
