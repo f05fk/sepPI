@@ -47,18 +47,20 @@ while ($run)
     {
         if ($uid1 eq "")
         {
-#            print "$uid3 went away\n";
+            print "$uid3 went away\n";
+            $uid3 = "";
             command("mpc pause");
         }
         elsif ($uid1 eq $uid3)
         {
-#            print "$uid3 came back\n";
+            print "$uid3 came back\n";
             command("mpc play");
         }
         else
         {
+            print "$uid3 went away\n" if ($uid3 ne "");
             $uid3 = $uid1;
-#            print "$uid3 is NEW!\n";
+            print "$uid3 is NEW!\n";
             command("mpc stop");
             command("mpc clear");
             command("mpc load $uid3");

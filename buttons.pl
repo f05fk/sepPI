@@ -104,25 +104,25 @@ sub calculateCombinedState
 
 sub initialize
 {
-#    print "initialize\n";
+    print "initialize\n";
     system("mpc volume 50 >/dev/null 2>&1");
 }
 
 sub actionNext
 {
-#    print "button [>] pressed\n";
+    print "next track: button [>] pressed\n";
     system("mpc next >/dev/null 2>&1");
 }
 
 sub actionPrev
 {
-#    print "button [<] pressed\n";
+    print "previous track: button [<] pressed\n";
     system("mpc cdprev >/dev/null 2>&1");
 }
 
 sub actionRandom
 {
-#    print "random pressed\n";
+    print "random: buttons [<>] pressed\n";
     system("mpc stop >/dev/null 2>&1");
     system("mpc shuffle >/dev/null 2>&1");
     system("mpc play >/dev/null 2>&1");
@@ -130,18 +130,18 @@ sub actionRandom
 
 sub actionVolumePlus
 {
-#    print "button [+] pressed\n";
+    print "volume up: button [+] pressed\n";
     system("mpc volume +5 >/dev/null 2>&1");
 }
 
 sub actionVolumeMinus
 {
-#    print "button [-] pressed\n";
+    print "volume down: button [-] pressed\n";
     system("mpc volume -5 >/dev/null 2>&1");
 }
 
 sub actionShutdown
 {
-#    print "shutdown pressed\n";
-#    system("init 0 >/dev/null 2>&1");
+    print "shutdown: buttons [-+<>] pressed\n";
+    system("init 0 >/dev/null 2>&1");
 }
