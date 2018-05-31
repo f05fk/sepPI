@@ -48,7 +48,6 @@ while ($run)
         if ($uid1 eq "")
         {
             print "$uid3 went away\n";
-            $uid3 = "";
             command("mpc pause");
         }
         elsif ($uid1 eq $uid3)
@@ -58,7 +57,7 @@ while ($run)
         }
         else
         {
-            print "$uid3 went away\n" if ($uid3 ne "");
+            print "$uid3 went away\n" if ($uid2 ne "");
             $uid3 = $uid1;
             print "$uid3 is NEW!\n";
             command("mpc stop");
