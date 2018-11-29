@@ -22,14 +22,23 @@ use strict;
 use warnings;
 
 use MFRC522;
+use WorkerMPD;
+use WorkerNOP;
+use WorkerScript;
 
 my $run = 1;
 $SIG{INT}  = sub { $run = 0 };
 $SIG{TERM} = sub { $run = 0 };
 
+my $workerMPD = WorkerMPD->new();
+my $workerNOP = WorkerNOP->new();
+my $workerScript = WorkerScript->new();
+my $worker = $workerNOP;
+
 #print "reset\n";
-command("mpc stop");
-command("mpc clear");
+$workerMPD->reset();
+$workerNOP->reset();
+$workerScript->reset();
 
 my $mfrc522 = MFRC522->new();
 $mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
@@ -48,22 +57,23 @@ while ($run)
         if ($uid1 eq "")
         {
             print "$uid3 went away\n";
-            command("mpc pause");
+            $worker->pause();
         }
         elsif ($uid1 eq $uid3)
         {
             print "$uid3 came back\n";
-            command("mpc play");
+            $worker->resume();
         }
         else
         {
             print "$uid3 went away\n" if ($uid2 ne "");
             $uid3 = $uid1;
             print "$uid3 is NEW!\n";
-            command("mpc stop");
-            command("mpc clear");
-            command("mpc load $uid3");
-            command("mpc play");
+            $worker->stop();
+            $worker = ($workerScript->play($uid3) == 0) ? $workerScript :
+                      ($workerMPD->play($uid3) == 0) ? $workerMPD :
+                      ($workerMPD->play("unknown") == 0) ? $workerMPD :
+                       $workerNOP;
         }
         $uid2 = $uid1;
     }
