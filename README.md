@@ -105,3 +105,40 @@ Install mpd with "apt-get install mpd".
 
 Optionally configure "/etc/mpd.conf" to set "music\_directory" and "playlist\_directory" to a
 location where you want to put your music and playlists.
+
+
+## Dependencies
+
+The software depends on the Perl implementation of BCM2835 that itself depends on a C implementation.
+Both are not part of the standard Raspbian distribution.
+
+First get the C library from https://www.airspayce.com/mikem/bcm2835/, unpack it and install the library with:
+
+    ./configure
+    make
+    make check
+    make install
+
+The last step has to be done as superuser root.
+
+Then get the Perl module from https://metacpan.org/pod/Device::BCM2835, unpack it and install the module with:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Again, the last step has to be done as superuser root.
+
+
+## Installation
+
+Simply clone the Github repository into the "pi" user's home directory "/home/pi/" with
+
+    git clone https://github.com/f05fk/sepPI.git
+
+There are different possibilities for starting the application. The most simple way is to add sepPI.sh
+to /etc/rc.local:
+
+    # add to /etc/rc.local for automatic start
+    /home/pi/sepPI/sepPI.sh
