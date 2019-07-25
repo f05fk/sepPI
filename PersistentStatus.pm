@@ -17,81 +17,91 @@
 # SPDX-License-Identifier: GPL-3.0-or-later                             #
 #########################################################################
 
-package WorkerMPD;
+package PersistentStatus;
 
 use strict;
 use warnings;
 
-use PersistentStatus;
+my $SCRIPT_DIR = "/home/pi/status";
 
 sub new
 {
     my $class = shift;
+    my $playlist = shift;
 
     my $self = {};
     bless $self;
 
+    $self->{playlist} = $playlist;
+    $self->{file} = "$SCRIPT_DIR/$playlist";
+
     return $self;
 }
 
-sub reset
+sub save
 {
     my $self = shift;
 
-    _command("mpc stop");
-    _command("mpc clear");
+    open MPCST, "mpc status |" || return 1;
+    my $st = join '', <MPCST>;
+    close MPCST || return 1;
+
+    return 2 if ($st !~ m/\[paused\]/);
+
+    open MPCPL, "mpc playlist |" || return 3;
+    my $pl = join '', <MPCPL>;
+    close MPCPL || return 3;
+
+    return 4 if ($pl =~ m/^https?:\/\//);
+
+    open STATUS, ">$self->{file}" || return 5;
+    print STATUS $st;
+    print STATUS $pl;
+    close STATUS || return 5;
+
+    chown 1000, 1000, $self->{file} || return 6;
+
     return 0;
 }
 
-sub play
+sub load
 {
     my $self = shift;
-    my $uid = shift;
 
-    _command("mpc load $uid") == 0 || return 1;
-    PersistentStatus->new($uid)->load();
-    _command("mpc play");
+    -f $self->{file} || return 0;
+
+    print "load...\n";
+
+    open STATUS, "<$self->{file}" || return 1;
+    my $current = <STATUS>;
+    my $status = <STATUS>;
+    my $extra = <STATUS>;
+    my @playlist = <STATUS>;
+    close STATUS || return 1;
+
+    unlink $self->{file} || return 2;
+
+#    open MPCPL, "mpc playlist |" || return 3;
+#    my $pl = join '', <MPCPL>;
+#    close MPCPL || return 3;
+
+    $status =~ m/^\[paused\] +#(\d+)\/\d+ *(\d+:\d+)\/.*/ || return 4;
+    my $song = $1;
+    my $time = $2;
+
+    system("mpc play $song >/dev/null 2>&1") == 0 || return 5;
+    system("mpc seek $time >/dev/null 2>&1") == 0 || return 5;
+
     return 0;
 }
 
-sub pause
+sub clean
 {
     my $self = shift;
-    my $uid = shift;
 
-    _command("mpc pause");
-    PersistentStatus->new($uid)->save();
+    unlink $self->{file};
+
     return 0;
-}
-
-sub resume
-{
-    my $self = shift;
-    my $uid = shift;
-
-    PersistentStatus->new($uid)->clean();
-    _command("mpc play");
-    return 0;
-}
-
-sub stop
-{
-    my $self = shift;
-    my $uid = shift;
-
-    _command("mpc pause");
-    PersistentStatus->new($uid)->save();
-
-    _command("mpc stop");
-    _command("mpc clear");
-    return 0;
-}
-
-sub _command
-{
-    my $command = shift;
-
-    return system("$command >/dev/null 2>&1");
 }
 
 1;

@@ -49,6 +49,7 @@ my %actions =
     0b0011 => \&actionRandom,
     0b0100 => \&actionVolumePlus,
     0b1000 => \&actionVolumeMinus,
+    0b1100 => \&actionReset,
     0b1111 => \&actionShutdown,
 );
 
@@ -138,6 +139,12 @@ sub actionVolumeMinus
 {
     print "volume down: button [-] pressed\n";
     system("mpc volume -5 >/dev/null 2>&1");
+}
+
+sub actionReset
+{
+    print "reset: buttons [+-] pressed\n";
+    system("mpc play 1 >/dev/null 2>&1");
 }
 
 sub actionShutdown

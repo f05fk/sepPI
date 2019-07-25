@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/pi/sepPI
+#!/usr/bin/perl
 #########################################################################
 # Copyright (C) 2017-2019 Claus Schrammel <claus@f05fk.net>             #
 #                                                                       #
@@ -20,6 +20,8 @@
 
 use strict;
 use warnings;
+
+use Find::Lib ".";
 
 use Term::ReadKey;
 

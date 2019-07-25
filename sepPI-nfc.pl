@@ -1,4 +1,4 @@
-#!/usr/bin/perl -I /home/pi/sepPI
+#!/usr/bin/perl
 #########################################################################
 # Copyright (C) 2017-2019 Claus Schrammel <claus@f05fk.net>             #
 #                                                                       #
@@ -20,6 +20,8 @@
 
 use strict;
 use warnings;
+
+use Find::Lib ".";
 
 use MFRC522;
 use WorkerMPD;
@@ -57,19 +59,19 @@ while ($run)
         if ($uid1 eq "")
         {
             print "$uid3 went away\n";
-            $worker->pause();
+            $worker->pause($uid3);
         }
         elsif ($uid1 eq $uid3)
         {
             print "$uid3 came back\n";
-            $worker->resume();
+            $worker->resume($uid3);
         }
         else
         {
             print "$uid3 went away\n" if ($uid2 ne "");
+            $worker->stop($uid3);
             $uid3 = $uid1;
             print "$uid3 is NEW!\n";
-            $worker->stop();
             $worker = ($workerScript->play($uid3) == 0) ? $workerScript :
                       ($workerMPD->play($uid3) == 0) ? $workerMPD :
                       ($workerMPD->play("unknown") == 0) ? $workerMPD :
