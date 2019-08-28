@@ -40,6 +40,7 @@ sub reset
 
     _command("mpc stop");
     _command("mpc clear");
+    _command("mpc random off");
     return 0;
 }
 
@@ -49,6 +50,7 @@ sub play
     my $uid = shift;
 
     _command("mpc load $uid") == 0 || return 1;
+    _command("mpc random off");
     PersistentStatus->new($uid)->load();
     _command("mpc play");
     return 0;
@@ -84,6 +86,7 @@ sub stop
 
     _command("mpc stop");
     _command("mpc clear");
+    _command("mpc random off");
     return 0;
 }
 

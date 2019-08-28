@@ -49,7 +49,7 @@ my %actions =
     0b0011 => \&actionRandom,
     0b0100 => \&actionVolumePlus,
     0b1000 => \&actionVolumeMinus,
-    0b1100 => \&actionReset,
+    0b1100 => \&actionRewind,
     0b1111 => \&actionShutdown,
 );
 
@@ -125,7 +125,8 @@ sub actionRandom
 {
     print "random: buttons [<>] pressed\n";
     system("mpc stop >/dev/null 2>&1");
-    system("mpc shuffle >/dev/null 2>&1");
+    system("mpc random off >/dev/null 2>&1");
+    system("mpc random on >/dev/null 2>&1");
     system("mpc play >/dev/null 2>&1");
 }
 
@@ -141,9 +142,11 @@ sub actionVolumeMinus
     system("mpc volume -5 >/dev/null 2>&1");
 }
 
-sub actionReset
+sub actionRewind
 {
-    print "reset: buttons [+-] pressed\n";
+    print "rewind: buttons [+-] pressed\n";
+    system("mpc stop >/dev/null 2>&1");
+    system("mpc random off >/dev/null 2>&1");
     system("mpc play 1 >/dev/null 2>&1");
 }
 
