@@ -103,6 +103,14 @@ sub calculateCombinedState
     return $combinedState;
 }
 
+sub isPlaying
+{
+    open MPC, "mpc |";
+    my $mpc = join '', <MPC>;
+    close MPC;
+    return $mpc =~ m/\[playing\]/s;
+}
+
 sub initialize
 {
     print "initialize\n";
@@ -112,13 +120,27 @@ sub initialize
 sub actionNext
 {
     print "next track: button [>] pressed\n";
-    system("mpc next >/dev/null 2>&1");
+    if (isPlaying())
+    {
+        system("mpc next >/dev/null 2>&1");
+    }
+    else
+    {
+        print "not playing...\n";
+    }
 }
 
 sub actionPrev
 {
     print "previous track: button [<] pressed\n";
-    system("mpc cdprev >/dev/null 2>&1");
+    if (isPlaying())
+    {
+        system("mpc cdprev >/dev/null 2>&1");
+    }
+    else
+    {
+        print "not playing...\n";
+    }
 }
 
 sub actionRandom
