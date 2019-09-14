@@ -29,6 +29,8 @@ sub new
     my $class = shift;
     my $playlist = shift;
 
+    print "new PersistentStatus [$playlist]\n";
+
     my $self = {};
     bless $self;
 
@@ -42,24 +44,38 @@ sub save
 {
     my $self = shift;
 
+    print "PersistentStatus [$self->{playlist}] save\n";
+
+    # get the status for current song number and time
     open MPCST, "mpc status |" || return 1;
     my $st = join '', <MPCST>;
     close MPCST || return 1;
 
+    # can only persist a paused state
     return 2 if ($st !~ m/\[paused\]/);
 
+    print "is paused...\n";
+
+    # get the playlist to be persisted as well
     open MPCPL, "mpc playlist |" || return 3;
     my $pl = join '', <MPCPL>;
     close MPCPL || return 3;
 
+    # cannot persist streams
     return 4 if ($pl =~ m/^https?:\/\//);
 
+    print "is no stream...\n";
+
+    # write the persistent state
     open STATUS, ">$self->{file}" || return 5;
     print STATUS $st;
     print STATUS $pl;
     close STATUS || return 5;
 
+    # chown pi:pi file
     chown 1000, 1000, $self->{file} || return 6;
+
+    print "PersistentStatus [$self->{playlist}] saved\n";
 
     return 0;
 }
@@ -68,10 +84,26 @@ sub load
 {
     my $self = shift;
 
+    print "PersistentStatus [$self->{playlist}] load\n";
+
+    # if file does not exist, then there is nothing to load and we are done
     -f $self->{file} || return 0;
+
+    # calculate age of file
+    my $modtime = (stat($self->{file}))[9];
+    my $now = time();
+    my $days = ($now - $modtime) / 24 / 60 / 60;
+    if ($days > 7)
+    {
+	# delete and skip if file is too old
+        print "PersistentStatus [$self->{playlist}] too old\n";
+        unlink $self->{file} || return 2;
+        return 0;
+    }
 
     print "load...\n";
 
+    # load file
     open STATUS, "<$self->{file}" || return 1;
     my $current = <STATUS>;
     my $status = <STATUS>;
@@ -79,18 +111,24 @@ sub load
     my @playlist = <STATUS>;
     close STATUS || return 1;
 
+    # and delete it since it is no longer needed
     unlink $self->{file} || return 2;
 
+    # load the current playlist (for comparison with the persisted playlist)
 #    open MPCPL, "mpc playlist |" || return 3;
 #    my $pl = join '', <MPCPL>;
 #    close MPCPL || return 3;
 
+    # parse song number and time for resuming at correct point
     $status =~ m/^\[paused\] +#(\d+)\/\d+ *(\d+:\d+)\/.*/ || return 4;
     my $song = $1;
     my $time = $2;
 
+    # resume
     system("mpc play $song >/dev/null 2>&1") == 0 || return 5;
     system("mpc seek $time >/dev/null 2>&1") == 0 || return 5;
+
+    print "PersistentStatus [$self->{playlist}] loaded\n";
 
     return 0;
 }
@@ -98,6 +136,8 @@ sub load
 sub clean
 {
     my $self = shift;
+
+    print "PersistentStatus [$self->{playlist}] clean\n";
 
     unlink $self->{file};
 
