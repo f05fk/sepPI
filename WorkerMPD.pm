@@ -28,6 +28,8 @@ sub new
 {
     my $class = shift;
 
+    print "WorkerMPD new\n";
+
     my $self = {};
     bless $self;
 
@@ -37,6 +39,8 @@ sub new
 sub reset
 {
     my $self = shift;
+
+    print "WorkerMPD reset\n";
 
     _command("mpc stop");
     _command("mpc clear");
@@ -48,6 +52,8 @@ sub play
 {
     my $self = shift;
     my $uid = shift;
+
+    print "WorkerMPD [$uid] play\n";
 
     _command("mpc load $uid") == 0 || return 1;
     _command("mpc random off");
@@ -61,6 +67,8 @@ sub pause
     my $self = shift;
     my $uid = shift;
 
+    print "WorkerMPD [$uid] pause\n";
+
     _command("mpc pause");
     PersistentStatus->new($uid)->save();
     return 0;
@@ -71,6 +79,8 @@ sub resume
     my $self = shift;
     my $uid = shift;
 
+    print "WorkerMPD [$uid] resume\n";
+
     PersistentStatus->new($uid)->clean();
     _command("mpc play");
     return 0;
@@ -80,6 +90,8 @@ sub stop
 {
     my $self = shift;
     my $uid = shift;
+
+    print "WorkerMPD [$uid] stop\n";
 
     _command("mpc pause");
     PersistentStatus->new($uid)->save();

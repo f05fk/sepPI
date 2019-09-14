@@ -28,6 +28,8 @@ sub new
 {
     my $class = shift;
 
+    print "WorkerScript new\n";
+
     my $self = {};
     bless $self;
 
@@ -38,6 +40,8 @@ sub reset
 {
     my $self = shift;
 
+    print "WorkerScript reset\n";
+
     # do nothing
     return 0;
 }
@@ -46,6 +50,8 @@ sub play
 {
     my $self = shift;
     my $uid = shift;
+
+    print "WorkerScript [$uid] play\n";
 
     $self->{script} = "$SCRIPT_DIR/$uid";
     return 1 if (!-x $self->{script});
@@ -57,6 +63,9 @@ sub play
 sub pause
 {
     my $self = shift;
+    my $uid = shift;
+
+    print "WorkerScript [$uid] play\n";
 
     _command("$self->{script} pause");
     return 0;
@@ -65,6 +74,9 @@ sub pause
 sub resume
 {
     my $self = shift;
+    my $uid = shift;
+
+    print "WorkerScript [$uid] resume\n";
 
     _command("$self->{script} resume");
     return 0;
@@ -73,6 +85,9 @@ sub resume
 sub stop
 {
     my $self = shift;
+    my $uid = shift;
+
+    print "WorkerScript [$uid] stop\n";
 
     _command("$self->{script} stop");
     return 0;

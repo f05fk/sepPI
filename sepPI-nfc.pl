@@ -27,6 +27,7 @@ use MFRC522;
 use WorkerMPD;
 use WorkerNOP;
 use WorkerScript;
+use WorkerUnknown;
 
 my $run = 1;
 $SIG{INT}  = sub { $run = 0 };
@@ -35,12 +36,14 @@ $SIG{TERM} = sub { $run = 0 };
 my $workerMPD = WorkerMPD->new();
 my $workerNOP = WorkerNOP->new();
 my $workerScript = WorkerScript->new();
+my $workerUnknown = WorkerUnknown->new();
 my $worker = $workerNOP;
 
 #print "reset\n";
 $workerMPD->reset();
 $workerNOP->reset();
 $workerScript->reset();
+$workerUnknown->reset();
 
 my $mfrc522 = MFRC522->new();
 $mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
@@ -74,7 +77,7 @@ while ($run)
             print "$uid3 is NEW!\n";
             $worker = ($workerScript->play($uid3) == 0) ? $workerScript :
                       ($workerMPD->play($uid3) == 0) ? $workerMPD :
-                      ($workerMPD->play("unknown") == 0) ? $workerMPD :
+                      ($workerUnknown->play($uid3) == 0) ? $workerUnknown :
                        $workerNOP;
         }
         $uid2 = $uid1;

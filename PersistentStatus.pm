@@ -29,7 +29,7 @@ sub new
     my $class = shift;
     my $playlist = shift;
 
-    print "new PersistentStatus [$playlist]\n";
+    print "PersistentStatus [$playlist] new\n";
 
     my $self = {};
     bless $self;
