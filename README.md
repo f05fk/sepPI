@@ -10,7 +10,7 @@ tags and control audio volume and track number with just 4 buttons.
 
 ## Hardware List
 
-* RaspberryPI 1 Model A+ (but any RaspberryPI with 40pin header should do)
+* RaspberryPI ZERO WH, RaspberryPI 1 Model A+ (but any RaspberryPI with 40pin header should do)
 * WLAN dongle (if the RaspberryPI does not already have WIFI)
 * Micro USB power supply
 * SD card
@@ -22,27 +22,6 @@ tags and control audio volume and track number with just 4 buttons.
 * soldering utilities
 
 
-## Datasheets
-https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf
-http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf
-
-
-## Amplifier
-https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/
-
-
-## References
-https://tutorials-raspberrypi.de/raspberry-pi-rfid-rc522-tueroeffner-nfc/
-https://github.com/mxgxw/MFRC522-python
-https://metacpan.org/pod/Device::BCM2835
-https://github.com/miguelbalboa/rfid
-https://github.com/miguelbalboa/rfid/tree/master/src
-https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp
-https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.h
-http://code.google.com/p/rpi-rc522
-https://github.com/codepope/rpi-rc522
-
-
 ## Wiring
 
                                  RaspberryPI
@@ -50,8 +29,8 @@ https://github.com/codepope/rpi-rc522
                          | GPIO   PIN | PIN   GPIO |
                          +------------+------------+
                          | PWR 3V3  1 | 2   5V PWR |
-                         | 2        3 | 4   5V PWR |
-                         | 3        5 | 6   GROUND |
+                         | 2        3 | 4   5V PWR | --> MAX98357.Vin (*)
+                         | 3        5 | 6   GROUND | --> MAX98357.GND (*)
                          | 4        7 | 8       14 |
                          | GROUND   9 | 10      15 |
                          | 17      11 | 12 CLK  18 | --> MAX98357.BCLK
@@ -87,14 +66,23 @@ https://github.com/codepope/rpi-rc522
 
                                   MAX98357
                             +------------------+
-          RPI.35 (FS)   <-- | LRCLK            |
-          RPI.12 (CLK)  <-- | BCLK             |
-          RPI.40 (DOUT) <-- | DIN     OUTPUT - | --> SPEAKER -
+        RPI.35 (FS)     <-- | LRCLK            |
+        RPI.12 (CLK)    <-- | BCLK             |
+        RPI.40 (DOUT)   <-- | DIN     OUTPUT - | --> SPEAKER -
                             | GAIN             |
                             | SD      OUTPUT + | --> SPEAKER +
-     POWER SUPPLY (GND) <-- | GND              |
-     POWER SUPPLY (5V)  <-- | Vin              |
+    (*) RPI.6  (GROUND) <-- | GND              |
+    (*) RPI.4  (5V PWR) <-- | Vin              |
                             +------------------+
+
+(*) There are some insteresting issues with the power supply of the MAX98357. The first boxes
+were built with the RaspberryPI 1 Model A+. The speaker only worked when it was touched. There
+was some problem with the voltage potentials. Connecting the MAX98357 to the power supply
+directly (without going through the RaspberryPI) solved the problem.
+
+Newer boxes were built with the RaspberryPI ZERO WH. There it is the other way round. Therefore
+the power supply of the MAX98357 had to be taken from the pins of the RaspberryPI.
+
 
 ## Setup RaspberryPI
 
@@ -142,3 +130,27 @@ to /etc/rc.local:
 
     # add to /etc/rc.local for automatic start
     /home/pi/sepPI/sepPI.sh
+
+
+## Datasheets NFC/RFID
+
+* [https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf](https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf)
+* [http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf](http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf)
+
+
+## Amplifier
+
+* [https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/](https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/)
+
+
+## References
+
+* [https://tutorials-raspberrypi.de/raspberry-pi-rfid-rc522-tueroeffner-nfc/](https://tutorials-raspberrypi.de/raspberry-pi-rfid-rc522-tueroeffner-nfc/)
+* [https://github.com/mxgxw/MFRC522-python](https://github.com/mxgxw/MFRC522-python)
+* [https://metacpan.org/pod/Device::BCM2835](https://metacpan.org/pod/Device::BCM2835)
+* [https://github.com/miguelbalboa/rfid](https://github.com/miguelbalboa/rfid)
+* [https://github.com/miguelbalboa/rfid/tree/master/src](https://github.com/miguelbalboa/rfid/tree/master/src)
+* [https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp](https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp)
+* [https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.h](https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.h)
+* [http://code.google.com/p/rpi-rc522](http://code.google.com/p/rpi-rc522)
+* [https://github.com/codepope/rpi-rc522](https://github.com/codepope/rpi-rc522)
