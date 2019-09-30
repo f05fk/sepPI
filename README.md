@@ -86,13 +86,36 @@ the power supply of the MAX98357 had to be taken from the pins of the RaspberryP
 
 ## Setup RaspberryPI
 
-Install Raspbian on the SD card and do initial setup with raspi-config. Also enable SPI with
-raspi-config.
+Install Raspbian on the SD card and do initial setup with raspi-config:
 
-Install mpd with "apt-get install mpd".
+* change the pi user's password (RECOMMENDED)
+* change the hostname (RECOMMENDED)
+* setup WiFi (RECOMMENDED)
+* boot into console (RECOMMENDED)
+* enable SSH server (RECOMMENDED)
+* enable SPI (REQUIRED)
 
-Optionally configure "/etc/mpd.conf" to set "music\_directory" and "playlist\_directory" to a
-location where you want to put your music and playlists.
+Install additional software with `apt install`:
+
+* mpd (REQUIRED)
+* mpc (REQUIRED)
+* libfind-lib-perl (REQUIRED)
+* libterm-readkey-perl (RECOMMENDED)
+* git (RECOMMENDED)
+
+Configure `/etc/mpd.conf` and set:
+
+    music_directory       /home/pi/music
+    playlist_directory    /home/pi/playlists
+    metadata_to_use       none
+    replaygain            track
+
+
+## Setup Adafruit MAX98357 Amplifier
+
+Follow the guide on:
+
+* <https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/>
 
 
 ## Dependencies
@@ -105,18 +128,14 @@ First get the C library from https://www.airspayce.com/mikem/bcm2835/, unpack it
     ./configure
     make
     make check
-    make install
-
-The last step has to be done as superuser root.
+    sudo make install
 
 Then get the Perl module from https://metacpan.org/pod/Device::BCM2835, unpack it and install the module with:
 
     perl Makefile.PL
     make
     make test
-    make install
-
-Again, the last step has to be done as superuser root.
+    sudo make install
 
 
 ## Installation
@@ -131,16 +150,27 @@ to /etc/rc.local:
     # add to /etc/rc.local for automatic start
     /home/pi/sepPI/sepPI.sh
 
+Create these directories:
+
+* /home/pi/music
+* /home/pi/playlists
+* /home/pi/scripts
+* /home/pi/status
+
+Fill `music` with the MP3s and `playlists` with M3U playlists referencing relative to `music`.
+Tags may be associated to music by creating symlinks in `playlists`, e.g. `11-22-33-44.m3u -> example.m3u`.
+The script `assignTag.pl` may be a useful tool to do that.
+
+Put your scripts into the `scripts` directory. Examples are provided with `script_*`. Scripts may also be
+associated with symlinks, e.g. `44-33-22-11 -> example.sh`.
+
+The `status` directory is used by sepPI to store the PersistentStatus data.
+
 
 ## Datasheets NFC/RFID
 
 * <https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf>
 * <http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf>
-
-
-## Amplifier
-
-* <https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/>
 
 
 ## References
