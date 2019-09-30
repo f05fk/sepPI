@@ -134,23 +134,23 @@ to /etc/rc.local:
 
 ## Datasheets NFC/RFID
 
-* [https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf](https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf)
-* [http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf](http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf)
+* <https://www.nxp.com/docs/en/data-sheet/MFRC522.pdf>
+* <http://wg8.de/wg8n1496_17n3613_Ballot_FCD14443-3.pdf>
 
 
 ## Amplifier
 
-* [https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/](https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/)
+* <https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/>
 
 
 ## References
 
-* [https://tutorials-raspberrypi.de/raspberry-pi-rfid-rc522-tueroeffner-nfc/](https://tutorials-raspberrypi.de/raspberry-pi-rfid-rc522-tueroeffner-nfc/)
-* [https://github.com/mxgxw/MFRC522-python](https://github.com/mxgxw/MFRC522-python)
-* [https://metacpan.org/pod/Device::BCM2835](https://metacpan.org/pod/Device::BCM2835)
-* [https://github.com/miguelbalboa/rfid](https://github.com/miguelbalboa/rfid)
-* [https://github.com/miguelbalboa/rfid/tree/master/src](https://github.com/miguelbalboa/rfid/tree/master/src)
-* [https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp](https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp)
-* [https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.h](https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.h)
-* [http://code.google.com/p/rpi-rc522](http://code.google.com/p/rpi-rc522)
-* [https://github.com/codepope/rpi-rc522](https://github.com/codepope/rpi-rc522)
+* <https://tutorials-raspberrypi.de/raspberry-pi-rfid-rc522-tueroeffner-nfc/>
+* <https://github.com/mxgxw/MFRC522-python>
+* <https://metacpan.org/pod/Device::BCM2835>
+* <https://github.com/miguelbalboa/rfid>
+* <https://github.com/miguelbalboa/rfid/tree/master/src>
+* <https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.cpp>
+* <https://github.com/miguelbalboa/rfid/blob/master/src/MFRC522.h>
+* <http://code.google.com/p/rpi-rc522>
+* <https://github.com/codepope/rpi-rc522>
