@@ -1,7 +1,7 @@
 # sepPI
 Simple audio player box for kids with RFID tags based on RaspberryPI.
 
-
+<img width="100%" src="pictures/sepPIx4+tags.jpg"/>
 
 The main focus is kids, but not only. It can play music, radio plays and web radio streams.
 The handling of the box is designed to be simple: select the audio content with prepared RFID
