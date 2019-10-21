@@ -23,20 +23,20 @@ use warnings;
 
 use Find::Lib ".";
 
-use MFRC522;
-use WorkerMPD;
-use WorkerNOP;
-use WorkerScript;
-use WorkerUnknown;
+use SepPI::MFRC522;
+use SepPI::WorkerMPD;
+use SepPI::WorkerNOP;
+use SepPI::WorkerScript;
+use SepPI::WorkerUnknown;
 
 my $run = 1;
 $SIG{INT}  = sub { $run = 0 };
 $SIG{TERM} = sub { $run = 0 };
 
-my $workerMPD = WorkerMPD->new();
-my $workerNOP = WorkerNOP->new();
-my $workerScript = WorkerScript->new();
-my $workerUnknown = WorkerUnknown->new();
+my $workerMPD = SepPI::WorkerMPD->new();
+my $workerNOP = SepPI::WorkerNOP->new();
+my $workerScript = SepPI::WorkerScript->new();
+my $workerUnknown = SepPI::WorkerUnknown->new();
 my $worker = $workerNOP;
 
 #print "reset\n";
@@ -45,8 +45,8 @@ $workerNOP->reset();
 $workerScript->reset();
 $workerUnknown->reset();
 
-my $mfrc522 = MFRC522->new();
-$mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
+my $mfrc522 = SepPI::MFRC522->new();
+$mfrc522->pcd_setReceiverGain(SepPI::MFRC522::RECEIVER_GAIN_MAX);
 
 my $uid1 = "";
 my $uid2 = "";

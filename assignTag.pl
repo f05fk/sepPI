@@ -25,7 +25,7 @@ use Find::Lib ".";
 
 use Term::ReadKey;
 
-use MFRC522;
+use SepPI::MFRC522;
 
 my $PLAYLISTS_DIRECTORY = "/home/pi/playlists";
 my $run = 1;
@@ -36,8 +36,8 @@ chdir $PLAYLISTS_DIRECTORY || die "cannot go into playlists directory";
 
 ReadMode 4;
 
-my $mfrc522 = MFRC522->new();
-$mfrc522->pcd_setReceiverGain(MFRC522::RECEIVER_GAIN_MAX);
+my $mfrc522 = SepPI::MFRC522->new();
+$mfrc522->pcd_setReceiverGain(SepPI::MFRC522::RECEIVER_GAIN_MAX);
 
 my @playlists = ();
 loadPlaylists();

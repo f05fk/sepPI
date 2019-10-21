@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later                             #
 #########################################################################
 
-package WorkerScript;
+package SepPI::WorkerScript;
 
 use strict;
 use warnings;

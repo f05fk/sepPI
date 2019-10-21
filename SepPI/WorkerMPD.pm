@@ -17,16 +17,18 @@
 # SPDX-License-Identifier: GPL-3.0-or-later                             #
 #########################################################################
 
-package WorkerUnknown;
+package SepPI::WorkerMPD;
 
 use strict;
 use warnings;
+
+use SepPI::PersistentStatus;
 
 sub new
 {
     my $class = shift;
 
-    print "WorkerUnknown new\n";
+    print "WorkerMPD new\n";
 
     my $self = {};
     bless $self;
@@ -38,7 +40,7 @@ sub reset
 {
     my $self = shift;
 
-    print "WorkerUnknown reset\n";
+    print "WorkerMPD reset\n";
 
     _command("mpc stop");
     _command("mpc clear");
@@ -51,10 +53,11 @@ sub play
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerUnknown [$uid] play\n";
+    print "WorkerMPD [$uid] play\n";
 
-    _command("mpc load unknown") == 0 || return 1;
+    _command("mpc load $uid") == 0 || return 1;
     _command("mpc random off");
+    SepPI::PersistentStatus->new($uid)->load();
     _command("mpc play");
     return 0;
 }
@@ -64,9 +67,10 @@ sub pause
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerUnknown [$uid] pause\n";
+    print "WorkerMPD [$uid] pause\n";
 
     _command("mpc pause");
+    SepPI::PersistentStatus->new($uid)->save();
     return 0;
 }
 
@@ -75,8 +79,9 @@ sub resume
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerUnknown [$uid] resume\n";
+    print "WorkerMPD [$uid] resume\n";
 
+    SepPI::PersistentStatus->new($uid)->clean();
     _command("mpc play");
     return 0;
 }
@@ -86,7 +91,10 @@ sub stop
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerUnknown [$uid] stop\n";
+    print "WorkerMPD [$uid] stop\n";
+
+    _command("mpc pause");
+    SepPI::PersistentStatus->new($uid)->save();
 
     _command("mpc stop");
     _command("mpc clear");

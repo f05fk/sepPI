@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later                             #
 #########################################################################
 
-package MFRC522;
+package SepPI::MFRC522;
 
 use strict;
 use warnings;

@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later                             #
 #########################################################################
 
-package PersistentStatus;
+package SepPI::PersistentStatus;
 
 use strict;
 use warnings;

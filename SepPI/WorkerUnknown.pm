@@ -17,7 +17,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later                             #
 #########################################################################
 
-package WorkerNOP;
+package SepPI::WorkerUnknown;
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ sub new
 {
     my $class = shift;
 
-    print "WorkerNOP new\n";
+    print "WorkerUnknown new\n";
 
     my $self = {};
     bless $self;
@@ -38,9 +38,11 @@ sub reset
 {
     my $self = shift;
 
-    print "WorkerNOP reset\n";
+    print "WorkerUnknown reset\n";
 
-    # do nothing
+    _command("mpc stop");
+    _command("mpc clear");
+    _command("mpc random off");
     return 0;
 }
 
@@ -49,9 +51,11 @@ sub play
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerNOP [$uid] play\n";
+    print "WorkerUnknown [$uid] play\n";
 
-    # do nothing
+    _command("mpc load unknown") == 0 || return 1;
+    _command("mpc random off");
+    _command("mpc play");
     return 0;
 }
 
@@ -60,9 +64,9 @@ sub pause
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerNOP [$uid] pause\n";
+    print "WorkerUnknown [$uid] pause\n";
 
-    # do nothing
+    _command("mpc pause");
     return 0;
 }
 
@@ -71,9 +75,9 @@ sub resume
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerNOP [$uid] resume\n";
+    print "WorkerUnknown [$uid] resume\n";
 
-    # do nothing
+    _command("mpc play");
     return 0;
 }
 
@@ -82,10 +86,19 @@ sub stop
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerNOP [$uid] stop\n";
+    print "WorkerUnknown [$uid] stop\n";
 
-    # do nothing
+    _command("mpc stop");
+    _command("mpc clear");
+    _command("mpc random off");
     return 0;
+}
+
+sub _command
+{
+    my $command = shift;
+
+    return system("$command >/dev/null 2>&1");
 }
 
 1;
