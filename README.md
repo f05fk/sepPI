@@ -100,8 +100,9 @@ Install additional software with `apt install`:
 * mpd (REQUIRED)
 * mpc (REQUIRED)
 * libfind-lib-perl (REQUIRED)
-* libterm-readkey-perl (RECOMMENDED)
-* git (RECOMMENDED)
+* libterm-readkey-perl (RECOMMENDED; for assignTag.pl)
+* libio-all-lwp-perl (OPTIONAL; for TTS speach synthesis)
+* git (OPTIONAL; for installation from GitHub)
 
 Configure `/etc/mpd.conf` and set:
 
