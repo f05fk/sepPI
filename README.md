@@ -14,7 +14,8 @@ tags and control audio volume and track number with just 4 buttons.
 * WLAN dongle (if the RaspberryPI does not already have WIFI)
 * Micro USB power supply
 * SD card
-* MFRC522 RFID reader
+* PN532 RFID reader (recommended)
+* MFRC522 RFID reader (not recommended; bad experience with signal strength)
 * MAX98357 I2S Class-D Mono Amplifier
 * 4 or 8 Ohm speaker
 * 4 push buttons
@@ -28,11 +29,11 @@ tags and control audio volume and track number with just 4 buttons.
                          +------------+------------+
                          | GPIO   PIN | PIN   GPIO |
                          +------------+------------+
-                         | PWR 3V3  1 | 2   5V PWR |
-                         | 2        3 | 4   5V PWR | --> MAX98357.Vin (*)
-                         | 3        5 | 6   GROUND | --> MAX98357.GND (*)
+          PN532.VCC  <-- | PWR 3V3  1 | 2   5V PWR |
+          PN532.SDA  <-- | 2   SDA  3 | 4   5V PWR | --> MAX98357.Vin (*)
+          PN532.SCL  <-- | 3   SCL  5 | 6   GROUND | --> MAX98357.GND (*)
                          | 4        7 | 8       14 |
-                         | GROUND   9 | 10      15 |
+          PN532.GND  <-- | GROUND   9 | 10      15 |
                          | 17      11 | 12 CLK  18 | --> MAX98357.BCLK
                          | 27      13 | 14  GROUND | --> button volume+
                          | 22      15 | 16      23 | --> button volume+
@@ -49,6 +50,19 @@ tags and control audio volume and track number with just 4 buttons.
                          | 26      37 | 38 DIN  20 |
                          | GROUND  39 | 40 DOUT 21 | --> MAX98357.DIN
                          +------------+------------+
+
+
+                                 RFID-PN532
+                         +-------------------------+
+                         |    _________________    |
+                         |   / _______________ \   |
+    RPI.09 (GND)     <-- | GND                \ \  |
+    RPI.01 (3V3)     <-- | VCC                 | | |
+    RPI.03 (SDA)     <-- | SDA                 | | |
+    RPI.05 (SCL)     <-- | SCL _______________/ /  |
+                         |   \_________________/   |
+                         |                         |
+                         +-------------------------+
 
 
                                  RFID-RC522
