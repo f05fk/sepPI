@@ -132,6 +132,10 @@ Follow the guide on:
 * <https://learn.adafruit.com/adafruit-max98357-i2s-class-d-mono-amp/>
 
 
+## I2C
+
+    sudo apt-get install libusb-dev libpcsclite-dev i2c-tools libnfc-bin libnfc-examples libnfc-pn53x-examples
+
 ## Dependencies
 
 The software depends on the Perl implementation of BCM2835 that itself depends on a C implementation.
