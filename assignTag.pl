@@ -25,7 +25,7 @@ use Find::Lib ".";
 
 use Term::ReadKey;
 
-use SepPI::MFRC522;
+use SepPI::PN532;
 
 my $PLAYLISTS_DIRECTORY = "/home/pi/playlists";
 my $run = 1;
@@ -36,8 +36,7 @@ chdir $PLAYLISTS_DIRECTORY || die "cannot go into playlists directory";
 
 ReadMode 4;
 
-my $mfrc522 = SepPI::MFRC522->new();
-$mfrc522->pcd_setReceiverGain(SepPI::MFRC522::RECEIVER_GAIN_MAX);
+my $pn532 = SepPI::PN532->new();
 
 my @playlists = ();
 loadPlaylists();
@@ -58,13 +57,13 @@ while ($run)
 #    sleep 1;
 }
 
-$mfrc522->close();
+$pn532->close();
 ReadMode 0;
 exit 0;
 
 sub readRFID
 {
-    my ($status, @uid) = $mfrc522->picc_readUID();
+    my ($status, @uid) = $pn532->picc_readUID();
 
     $uid1 = join('-', map {sprintf "%02x", $_} reverse @uid);
 #    print "found PICC: status [$status] UID [$uid1]\n";
