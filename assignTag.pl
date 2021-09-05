@@ -93,36 +93,39 @@ sub readRFID
 
 sub readKey
 {
-    my $key = ReadKey(-1);
-    return if (!defined $key);
+    # readKey is much faster than readRFID, therefore read as many keys as possible
+    while (1) {
+        my $key = ReadKey(-1);
+        return if (!defined $key);
 
-    $searchString .= $key if ($key =~ m/^[-a-z0-9_.*+?]$/);
-    $searchString .= ".*" if ($key eq " ");
-    $searchString = substr($searchString, 0, -1) if ($key eq "\x7f");
-    $run = 0 if ($key eq "\cc");
+        $searchString .= $key if ($key =~ m/^[-a-z0-9_.*+?]$/);
+        $searchString .= ".*" if ($key eq " ");
+        $searchString = substr($searchString, 0, -1) if ($key eq "\x7f");
+        $run = 0 if ($key eq "\cc");
 
-    if ($key eq "\x1b") # "Esc"
-    {
-        $key = ReadKey(-1);
-        if (defined $key && $key eq "\x5b") # intermediate
+        if ($key eq "\x1b") # "Esc"
         {
             $key = ReadKey(-1);
-            if ($key eq "\x41") # up
+            if (defined $key && $key eq "\x5b") # intermediate
             {
-                $index--;
+                $key = ReadKey(-1);
+                if ($key eq "\x41") # up
+                {
+                    $index--;
+                }
+                if ($key eq "\x42") # down
+                {
+                    $index++;
+                }
             }
-            if ($key eq "\x42") # down
+            if (!defined $key) # only "Esc"
             {
-                $index++;
+                $searchString = "";
             }
         }
-        if (!defined $key) # only "Esc"
-        {
-            $searchString = "";
-        }
-    }
 
-    &display();
+        &display();
+    }
 }
 
 sub display
