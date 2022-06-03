@@ -65,7 +65,7 @@ sub pause
     my $self = shift;
     my $uid = shift;
 
-    print "WorkerScript [$uid] play\n";
+    print "WorkerScript [$uid] pause\n";
 
     _command("$self->{script} pause");
     return 0;
